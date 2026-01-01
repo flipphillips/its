@@ -1,5 +1,6 @@
 # Some important environment variables
 EMULATOR ?= pdp10-ka
+export EMULATOR
 
 # Sometimes you _really_ need to use a different `touch` or `rm`.
 TOUCH ?= touch
@@ -33,10 +34,13 @@ include conf/network
 
 # if user hasn't changed HOSTNAME, and MCHN is not DB, then update HOSTNAME
 ifeq ($(HOSTNAME),DB-ITS.EXAMPLE.COM)
-  ifneq ($(MCHN),DB)
-    HOSTNAME = $(MCHN)-ITS.EXAMPLE.COM
-  endif
+	ifneq ($(MCHN),DB)
+		HOSTNAME = $(MCHN)-ITS.EXAMPLE.COM
+	endif
 endif
+export MCHN
+export BASICS
+export MACSYMA
 
 # The directores listed in SRC, DOC, and BIN are put on the sources tape.
 SRC = syseng sysen1 sysen2 sysen3 sysnet kshack dragon channa	\
@@ -109,12 +113,13 @@ SIMH_IMLAC=tools/simh/BIN/imlac $(OUT)/ssv22.iml
 IMP=tools/simh/BIN/h316
 NCPD=tools/ncp/src/ncpd
 
-H3TEXT=$(shell cd build; ls h3text.*)
-NAMES=$(shell cd build; ls names.*)
-DDT=$(shell cd src; ls sysen1/ddt.* syseng/lsrtns.* syseng/msgs.* syseng/datime.* syseng/ntsddt.*)
-SALV=$(shell cd src; ls kshack/nsalv.* syseng/format.* syseng/rfn.*)
-KSFEDR=$(shell cd src; ls kshack/ksfedr.*)
-DUMP=$(shell cd src; ls syseng/dump.* sysnet/netwrk.*)
+H3TEXT := $(notdir $(wildcard build/h3text.*))
+NAMES := $(notdir $(wildcard build/names.*))
+DDT := $(patsubst src/%,%,$(wildcard \
+	src/sysen1/ddt.* src/syseng/lsrtns.* src/syseng/msgs.* src/syseng/datime.* src/syseng/ntsddt.*))
+SALV := $(patsubst src/%,%,$(wildcard src/kshack/nsalv.* src/syseng/format.* src/syseng/rfn.*))
+KSFEDR := $(patsubst src/%,%,$(wildcard src/kshack/ksfedr.*))
+DUMP := $(patsubst src/%,%,$(wildcard src/syseng/dump.* src/sysnet/netwrk.*))
 SMF:=$(addprefix tools/,$(addsuffix /.gitignore,$(SUBMODULES)))
 OUT=out/$(EMULATOR)
 
